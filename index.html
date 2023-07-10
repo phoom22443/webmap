@@ -7,9 +7,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
   <!-- นำเข้าไฟล์ JavaScript ของ Leaflet -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.FileLayer -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.js"></script>
+  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.Fullscreen -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.5.1/leaflet.fullscreen.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.5.1/Leaflet.fullscreen.min.js"></script>
+  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.ImageOverlay.Rotated -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-imageoverlay-rotated/1.0.1/leaflet-imageoverlay-rotated.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-imageoverlay-rotated/1.0.1/leaflet-imageoverlay-rotated.min.js"></script>
   <style>
     body, html {
       margin: 0;
@@ -22,13 +25,23 @@
       bottom: 0;
       width: 100%;
     }
+    .checkbox-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
-
-  <input type="file" id="file-input" accept=".tif" />
-  <button id="add-button">Add GeoTIFF</button>
+  <div class="checkbox-container">
+    <input type="checkbox" id="geotiff-checkbox" checked>
+    <label for="geotiff-checkbox">Show Geotiff</label>
+  </div>
 
   <script>
     var map = L.map('map', {
@@ -39,20 +52,22 @@
       maxZoom: 18,
     }).addTo(map);
 
-    document.getElementById('add-button').addEventListener('click', function() {
-      var fileInput = document.getElementById('file-input');
-      if (fileInput.files.length > 0) {
-        var file = fileInput.files[0];
-        var fileLayer = L.fileLayer.fileLoader(file, {
-          layerOptions: {
-            color: 'blue',
-            opacity: 0.7
-          }
-        }).addTo(map);
+    var geotiffUrl = 'https://example.com/path/to/geotiff.tif'; // เปลี่ยนเป็น URL ของ Geotiff ที่คุณต้องการแสดง
+
+    var geotiffLayer = L.imageOverlay.rotated(geotiffUrl, [13.7563, 100.5018], [13.7563, 100.5018], 0, {
+      opacity: 0.7,
+      interactive: false,
+    });
+
+    document.getElementById('geotiff-checkbox').addEventListener('change', function() {
+      if (this.checked) {
+        geotiffLayer.addTo(map);
       } else {
-        alert('Please select a GeoTIFF file.');
+        geotiffLayer.removeFrom(map);
       }
     });
+
+    geotiffLayer.addTo(map);
   </script>
 </body>
 </html>
