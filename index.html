@@ -2,11 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8">
-    <title>My Map Presentation</title>
+  <title>My Map Presentation</title>
   <!-- นำเข้าไฟล์ CSS ของ Leaflet -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
   <!-- นำเข้าไฟล์ JavaScript ของ Leaflet -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.FileLayer -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.js"></script>
   <style>
     #map {
       height: 400px;
@@ -17,20 +20,30 @@
   <h1>My Map Presentation</h1>
   <div id="map"></div>
 
-  <script>
-    // สร้างแผนที่ในตำแหน่งและขนาดที่ต้องการ
-    var map = L.map('map').setView([13.7563, 100.5018], 13);
+  <input type="file" id="file-input" accept=".tif" />
+  <button id="add-button">Add GeoTIFF</button>
 
-    // เพิ่มแผนที่ฐาน (ตัวอย่าง: OpenStreetMap)
+  <script>
+    var map = L.map('map').setView([13.7563, 100.5018], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 18,
     }).addTo(map);
 
-    // เพิ่มเครื่องหมาย (ตัวอย่าง: Marker ที่ตำแหน่งใด ๆ)
-    L.marker([13.7563, 100.5018]).addTo(map)
-      .bindPopup('สวัสดี นี่คือที่ตั้งของเรา!')
-      .openPopup();
+    document.getElementById('add-button').addEventListener('click', function() {
+      var fileInput = document.getElementById('file-input');
+      if (fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        var fileLayer = L.fileLayer.fileLoader(file, {
+          layerOptions: {
+            color: 'blue',
+            opacity: 0.7
+          }
+        }).addTo(map);
+      } else {
+        alert('Please select a GeoTIFF file.');
+      }
+    });
   </script>
 </body>
 </html>
