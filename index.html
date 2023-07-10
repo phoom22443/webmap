@@ -7,33 +7,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
   <!-- นำเข้าไฟล์ JavaScript ของ Leaflet -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.FileLayer -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-filelayer/0.2.0/leaflet.filelayer.min.js"></script>
+  <!-- นำเข้าไฟล์ CSS และ JavaScript ของ Leaflet.Shapefile -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.shapefile/2.1.0/leaflet.shapefile.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.shapefile/2.1.0/leaflet.shapefile.js"></script>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
     #map {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 100%;
+      height: 400px;
     }
   </style>
 </head>
 <body>
+  <h1>My Map Presentation</h1>
   <div id="map"></div>
 
-  <input type="file" id="file-input" accept=".tif" />
-  <button id="add-button">Add GeoTIFF</button>
+  <input type="file" id="file-input" accept=".zip" />
+  <button id="add-button">Add Shapefile</button>
 
   <script>
-    var map = L.map('map', {
-      fullscreenControl: true,
-    }).setView([13.7563, 100.5018], 13);
+    var map = L.map('map').setView([13.7563, 100.5018], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
       maxZoom: 18,
@@ -43,14 +34,19 @@
       var fileInput = document.getElementById('file-input');
       if (fileInput.files.length > 0) {
         var file = fileInput.files[0];
-        var fileLayer = L.fileLayer.fileLoader(file, {
-          layerOptions: {
+        var shapeLayer = new L.Shapefile(file, {
+          style: {
             color: 'blue',
-            opacity: 0.7
-          }
-        }).addTo(map);
+            fillColor: 'yellow',
+            fillOpacity: 0.5,
+          },
+        });
+        shapeLayer.addTo(map);
+        shapeLayer.once('data:loaded', function() {
+          map.fitBounds(shapeLayer.getBounds());
+        });
       } else {
-        alert('Please select a GeoTIFF file.');
+        alert('Please select a Shapefile ZIP file.');
       }
     });
   </script>
